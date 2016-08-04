@@ -1,0 +1,213 @@
+/*----------------------------------------
+           Simon says game
+          By: The LimeGlass
+----------------------------------------*/
+//pins and ports defined below (Don't change much)
+//Switches
+int switch1 = 2;//Yellow switch
+int switch2 = 9;//Green switch
+int switch3 = 10;//Red switch
+int switch4 = 12;//Blue switch
+int switchState = 0;//setup the testfor switch state function
+//speaker
+int speakerPort = 3;//the pin the speaker is on MUST have ~ for pin to work
+//leds
+int ledYellow = 6;//the pins a led is on
+int ledGreen = 7;
+int ledRed = 5;
+int ledBlue = 4;
+//color picker
+int colourStorage[25];//stores the colors, This is the max ammount of rounds the program can hold, Default = 25, Max ardionu can take = Unknown?
+long colorPicker;//number that is changed for the random color picker
+//random
+long randNumber;//random number starting int
+//initial setups (Don't change Unless you know what this does)
+int count = 0;//how many times the buttons are pressed
+int y = 1;
+int x = 0;
+//-----------------------------------------
+//configuration below, change to anything and code wont break
+//speaker frequencys
+const int frequency1 = 100;//change default frequencys here
+const int frequency2 = 200;
+const int frequency3 = 300;
+const int frequency4 = 400;
+//How fast the program runs
+int programSpeed = 100;//time is in milliseconds or ticks 1000 = 1second
+int roundDelay = 500;//the delay between the rounds
+boolean lightningFast = true;//makes the code run at lightningfast speeds (Faster may make leds change faster, resulting in player confusion)#TIP:All lightningFast options, overide the other function is sets
+int lightningFastSpeed = 10;//speed lightning is set at for all lightning fast functions
+int lightningFastGenerator = 10;//speed that is set for the generator when LightningFast is enabled
+boolean cancelSymbolsLightning = false;//set if fancySymbols is disabled on LightningFastFunction, having the fancySymbols function true or false will not matter to this
+//Generator settings
+int generatorDelay = 100;//set a delay before the generator starts #Bigger number means less lag, and a more smooth feel for the generator, default = 500
+boolean resetFunction = false;//setup if the program should reset if something goes wrong, or button is pressed wrong, default = True
+//Serial monitor configurations
+boolean fancySymbols = true;//adds lines and fancy text to the serial monitor when enabled. #TIP: May reduce program run speed drastically
+//round selector
+int roundSelector = 68;//pick how many rounds you want to run, This must be a lower number then the colourStorage#CAN BE ANY NUMBER, but after 68 colours, it starts to get glitchy
+//leds
+int ledTime = 200;//the time the led stays on for after it is pressed
+int ledTimeCPUOn = 500;//how long the indicator light is on for
+int ledTimeCPUOff = 100;//time between the cpu round changes led, this is displaying the colour to the player
+//----------------------------------------
+void setup(){//main setup
+  Serial.begin(9600);//this is manditory for printing to serial monitor, without the serial monitor doesnt work
+  randomSeed(analogRead(0));//setup for a random generation, without this, the first few numbers randomly generatored, wont be random
+  pinMode(switch1, INPUT);//switch pinmodes and imputs
+  pinMode(switch2, INPUT);
+  pinMode(switch3, INPUT);
+  pinMode(switch4, INPUT);
+  pinMode(ledYellow, OUTPUT);//led pinmodes and outputs
+  pinMode(ledGreen, OUTPUT);
+  pinMode(ledRed, OUTPUT);
+  pinMode(ledBlue, OUTPUT);
+  pinMode(speakerPort, OUTPUT);//define speaker as output
+  if(lightningFast){//if lightning is true run this below
+    if(cancelSymbolsLightning){
+      fancySymbols = !fancySymbols;//disable fancysymbols
+    }
+    programSpeed = lightningFastSpeed;
+    generatorDelay = lightningFastGenerator;
+    Serial.println("Lightning Fast enabled!");
+  }
+  if(fancySymbols){
+    Serial.println("----------Simon says code By: Sean Grover----------");
+  }
+  Serial.println("Generating colour patterns...");//notify that the colours are being generated
+  delay(generatorDelay);//delay for generator
+  if(resetFunction){
+    colourStorage[0] = 0;
+    Serial.println("Reset function enabled!");
+  }
+  generateColourVoid(roundSelector,generatorDelay);
+  if(fancySymbols){
+    Serial.println("---------------------------------------------------");
+  }
+ }
+void loop(){
+  runRounds(roundSelector, roundDelay);
+}
+void testForButtonVoid(int Round){
+      testForButton(Round,1,switch1,ledYellow);//adds a round picker to testForButton
+      testForButton(Round,2,switch2,ledGreen);
+      testForButton(Round,3,switch3,ledRed);
+      testForButton(Round,4,switch4,ledBlue);
+}
+void generateColourVoid(int roundSelectorNumber,int generatorDelayVoid){//adds unlimited ammounts of rounds to the generatorColour function
+  int generatorNumber = 1;//private
+  int var;//private, define the var or number
+  if(roundSelectorNumber == roundSelectorNumber){//if 1 = 1, this just starts the code, and defines the roundSelector
+    var = 1;//sets the var(number or round) to 1
+      while(var < roundSelectorNumber){//while the number above = round selector do this below
+        randNumber = random(1,5);//generate random number between 1 and 5 (will make numbers (1-4))1-4 means buttons
+        Serial.print("Color ");//say this
+        Serial.print(var);//print var which is the round number it is on
+        Serial.print(": ");//say this
+        colourStorage[var] = randNumber;//find out what colour is on a specific storage
+        Serial.println(colourStorage[var]);//print that starge colour number
+        delay(generatorDelayVoid);//delay for generator
+        generatorNumber++;//add 1 to the round selector so that this can generate forever
+        var++;//add 1 to the round so that it can generate forever
+      }
+  }
+}
+void runRounds(int roundSelectorRounds,int roundDelay1){
+  int var;
+  var = 1;
+  x++;
+    while(var <= x || roundSelectorRounds){
+      testButtonVoid(var);
+      delay(roundDelay1);//add config later
+      var++;
+    }
+}
+void testButtonVoid(int roundSelectorNumberButton){
+  if(roundSelectorNumberButton == roundSelectorNumberButton){//if 1 = 1, this just starts the code, and defines the which round is configured
+    roundSelectorNumberButton = 1;
+      while(roundSelectorNumberButton <= y){//while the number above = round selector do this below
+        cpuTurnVoid(roundSelectorNumberButton);
+        roundSelectorNumberButton++;
+      }
+      roundSelectorNumberButton = 1;
+        while(roundSelectorNumberButton <= y){//while the number above = round selector do this below
+          testForButtonVoid(roundSelectorNumberButton);//sets the var(number or round) to 0
+          roundSelectorNumberButton++;
+        }
+    y++;//tells the program to add another round, or meaning that it is adding another round if room is avalible
+    count++;//add 1 to the highscore
+  }
+}
+void cpuTurnVoid(int Round){
+      cpuTurn(Round,1,ledYellow);//adds a round picker to cpuTurn
+      cpuTurn(Round,2,ledGreen);
+      cpuTurn(Round,3,ledRed);
+      cpuTurn(Round,4,ledBlue);
+      delay(500);
+  }
+void cpuTurn(int colourStorageNumber,int randNumberPicker,int ledColour){
+    if (colourStorage[colourStorageNumber] == randNumberPicker){
+      //add led turn on when its cpu turn HERE
+      speakerTone(randNumberPicker,speakerPort,150);
+      digitalWrite(ledColour, HIGH);//set led on and HIGH or (Indicator for player)
+      delay(ledTimeCPUOn);
+      digitalWrite(ledColour, LOW);
+      delay(ledTimeCPUOff);
+      }
+  }
+void speakerTone (int Round,int speakerPort1,int duration){
+  if(Round == 1){
+    tone(speakerPort1,frequency1,duration);
+  }
+  if(Round == 2){
+    tone(speakerPort1,frequency2,duration);
+  }
+  if(Round == 3){
+    tone(speakerPort1,frequency3,duration);
+  }
+  if(Round == 4){
+    tone(speakerPort1,frequency4,duration);
+  }
+}
+void testForButtonFalse(int switchNumberVar,int switchFalse,int delayLedFail){
+  if(switchNumberVar != switchFalse && switchState == HIGH){
+    digitalWrite(ledYellow, HIGH);
+    digitalWrite(ledGreen, HIGH);
+    digitalWrite(ledRed, HIGH);
+    digitalWrite(ledBlue, HIGH);
+    Serial.print("High score: ");
+    Serial.println(count);
+    Serial.print("Thanks for playing");
+    delay(delayLedFail);//test
+      if(fancySymbols){
+        Serial.println("----------Simon says code By: Sean Grover----------");
+      }
+  }
+}
+void testForButton(int colourStorageNumber,int randNumberPicker,int switchNumber,int ledColour){
+    if (colourStorage[colourStorageNumber] == randNumberPicker){//do this for each round this tests for which round and random number was picked
+    switchState = digitalRead(switchNumber);
+      while(switchState == LOW){//test if button is not pressed
+        switchState = digitalRead(switch1);
+        testForButtonFalse(switchNumber,switch1,10000);
+        switchState = digitalRead(switch2);
+        testForButtonFalse(switchNumber,switch2,10000);
+        switchState = digitalRead(switch3);
+        testForButtonFalse(switchNumber,switch3,10000);
+        switchState = digitalRead(switch4);
+        testForButtonFalse(switchNumber,switch4,10000);
+        switchState = digitalRead(switchNumber);
+        digitalWrite(ledColour, LOW);
+      }
+    digitalWrite(ledColour, HIGH);//do this if button is pressed
+    delay(ledTime);
+      if (colourStorage[colourStorageNumber] == randNumberPicker){
+        speakerTone(randNumberPicker,speakerPort,150);
+      }
+  }
+  digitalWrite(ledYellow, LOW);//this below resets the led lights below, its needed
+  digitalWrite(ledGreen, LOW);
+  digitalWrite(ledRed, LOW);
+  digitalWrite(ledBlue, LOW);
+  delay(programSpeed);//THIS IS THE MAIN CONTROL, this sets the speed of the whole program
+}
