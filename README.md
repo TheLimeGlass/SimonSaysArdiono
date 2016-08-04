@@ -1,3 +1,3 @@
 # SimonSaysArdiono
-# By LimeGlass
+## By LimeGlass
 Simon says game coded with Ardiono
