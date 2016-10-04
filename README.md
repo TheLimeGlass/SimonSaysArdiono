@@ -1,3 +1,3 @@
-# SimonSaysArdiono
+# SimonSaysArduino
 ## By LimeGlass
-Simon says game coded with Ardiono
+Simon says game coded with Arduino
